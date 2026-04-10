@@ -1,0 +1,105 @@
+// ── LiftGrid Systems — Smart Elevator Control Platform ──
+
+Building [icon: building, color: blue] {
+  building_id INT [pk]
+  name VARCHAR(100)
+  address VARCHAR(255)
+  city VARCHAR(50)
+  total_floors INT
+}
+
+Floor [icon: layers, color: teal] {
+  floor_id INT [pk]
+  building_id INT [fk]
+  floor_number INT
+  label VARCHAR(50)
+}
+
+ElevatorShaft [icon: align-center, color: purple] {
+  shaft_id INT [pk]
+  building_id INT [fk]
+  shaft_code VARCHAR(20)
+  min_floor INT
+  max_floor INT
+}
+
+Elevator [icon: box, color: purple] {
+  elevator_id INT [pk]
+  shaft_id INT [fk]
+  model VARCHAR(100)
+  capacity_kg INT
+  max_persons INT
+  commissioned_on DATE
+}
+
+ElevatorFloorService [icon: link, color: gray] {
+  service_id INT [pk]
+  elevator_id INT [fk]
+  floor_id INT [fk]
+}
+
+ElevatorStatus [icon: activity, color: orange] {
+  status_id INT [pk]
+  elevator_id INT [fk]
+  current_floor_id INT [fk]
+  state VARCHAR(20)
+  direction VARCHAR(10)
+  updated_at DATETIME
+}
+
+FloorRequest [icon: arrow-up, color: yellow] {
+  request_id INT [pk]
+  floor_id INT [fk]
+  building_id INT [fk]
+  direction VARCHAR(10)
+  requested_at DATETIME
+  status VARCHAR(20)
+}
+
+RideAssignment [icon: git-branch, color: pink] {
+  assignment_id INT [pk]
+  request_id INT [fk]
+  elevator_id INT [fk]
+  assigned_at DATETIME
+  assignment_status VARCHAR(20)
+}
+
+RideLog [icon: clock, color: green] {
+  log_id INT [pk]
+  assignment_id INT [fk]
+  from_floor_id INT [fk]
+  to_floor_id INT [fk]
+  start_time DATETIME
+  end_time DATETIME
+  passengers_count INT
+}
+
+MaintenanceRecord [icon: tool, color: red] {
+  maintenance_id INT [pk]
+  elevator_id INT [fk]
+  type VARCHAR(50)
+  description VARCHAR(255)
+  scheduled_at DATETIME
+  completed_at DATETIME
+  status VARCHAR(20)
+  technician_name VARCHAR(100)
+}
+
+// ── Relationships ──
+
+Building.building_id < Floor.building_id 
+Building.building_id < ElevatorShaft.building_id 
+ElevatorShaft.shaft_id - Elevator.shaft_id
+
+Elevator.elevator_id < ElevatorFloorService.elevator_id 
+Floor.floor_id < ElevatorFloorService.floor_id 
+
+Elevator.elevator_id - ElevatorStatus.elevator_id
+Floor.floor_id < FloorRequest.floor_id 
+Building.building_id < FloorRequest.building_id 
+
+FloorRequest.request_id - RideAssignment.request_id 
+Elevator.elevator_id < RideAssignment.elevator_id 
+RideAssignment.assignment_id - RideLog.assignment_id 
+
+Elevator.elevator_id < MaintenanceRecord.elevator_id 
